@@ -9,17 +9,9 @@ class GameConfig {
     fun criarStatusInicial(gatoVenceu: Int, cercaVenceu: Int): GameState {
         val newGrid = MutableList(121) { QuadradoState.VAZIO }
         val posicaoInicialGato = 60
-        newGrid[posicaoInicialGato] = QuadradoState.GATO //inicia com o gato no meio
+        newGrid[posicaoInicialGato] = QuadradoState.GATO
 
-        val posicoesDisponiveis = (0 until 121)
-            .filter { it != posicaoInicialGato }
-            .shuffled()
-
-        val quantidadeCercas = (9..15).random()
-
-        posicoesDisponiveis
-            .take(quantidadeCercas)
-            .forEach { indice -> newGrid[indice] = QuadradoState.CERCA }
+        gerarCercasIniciais(newGrid, posicaoInicialGato)
 
         return GameState(
             grid = newGrid,
@@ -32,59 +24,80 @@ class GameConfig {
 
     fun jogada(estadoAtualGame: GameState, clickedIndex: Int): GameState {
 
+        //checagem de jogada
         if (estadoAtualGame.status != GameStatus.JOGANDO) return estadoAtualGame
+        if (!isMovimentoValido(estadoAtualGame, clickedIndex)) return estadoAtualGame
 
-        val vizinhosPermitidos = getVizinhos(estadoAtualGame.posicaoGato)
-
-        if (clickedIndex !in vizinhosPermitidos || estadoAtualGame.grid[clickedIndex] != QuadradoState.VAZIO){
-            return estadoAtualGame
+        //turno do gato e checagem de condição de vitória
+        val estadoPosTurnoGato = executarTurnoGato(estadoAtualGame, clickedIndex)
+        if (estadoPosTurnoGato.status == GameStatus.GATO_VENCEU) {
+            return estadoPosTurnoGato
         }
 
-        //move o gato
+        //turno da cerca e checagem de vitória
+        return executarTurnoCerca (estadoPosTurnoGato)
+    }
+
+    private fun gerarCercasIniciais(grid: MutableList<QuadradoState>, posicaoIgnorada: Int) {
+        val posicoesDisponiveis = (0 until 121)
+            .filter { it != posicaoIgnorada }
+            .shuffled()
+
+        val quantidadeCercas = (9..15).random()
+
+        posicoesDisponiveis
+            .take(quantidadeCercas)
+            .forEach { indice -> grid[indice] = QuadradoState.CERCA }
+    }
+
+    private fun isMovimentoValido(estadoAtualGame: GameState, clickedIndex: Int): Boolean {
+        val vizinhosPermitidos = getVizinhos(estadoAtualGame.posicaoGato)
+        return clickedIndex in vizinhosPermitidos && estadoAtualGame.grid[clickedIndex] == QuadradoState.VAZIO
+    }
+
+    private fun executarTurnoGato(estadoAtualGame: GameState, novoIndice: Int): GameState {
         val updatedGrid = estadoAtualGame.grid.toMutableList()
-        updatedGrid[estadoAtualGame.posicaoGato] = QuadradoState.VAZIO //esvazia quadrado antigo
-        updatedGrid[clickedIndex] = QuadradoState.GATO //coloca o gato
+        updatedGrid[estadoAtualGame.posicaoGato] = QuadradoState.VAZIO
+        updatedGrid[novoIndice] = QuadradoState.GATO
 
-        var novoStatus = GameStatus.JOGANDO
-
-        //condição de vitória do gato
-        if(isNaBorda(clickedIndex)){
-            novoStatus = GameStatus.GATO_VENCEU
-            return estadoAtualGame.copy(
+        return if (isNaBorda(novoIndice)) {
+            estadoAtualGame.copy(
                 grid = updatedGrid,
-                posicaoGato = clickedIndex,
-                status = novoStatus,
+                posicaoGato = novoIndice,
+                status = GameStatus.GATO_VENCEU,
                 seGatoVenceu = estadoAtualGame.seGatoVenceu + 1
             )
+        } else {
+            estadoAtualGame.copy(
+                grid = updatedGrid,
+                posicaoGato = novoIndice
+            )
         }
+    }
 
-        val novaPosicaoGato = clickedIndex
-        val indexParaCerca = calcularJogadaCPU(novaPosicaoGato, updatedGrid)
+    private fun executarTurnoCerca(estadoAtualGame: GameState): GameState {
+        val updatedGrid = estadoAtualGame.grid.toMutableList()
+        val indexParaCerca = calcularJogadaCerca(estadoAtualGame.posicaoGato, updatedGrid)
 
         if (indexParaCerca != -1) {
             updatedGrid[indexParaCerca] = QuadradoState.CERCA
         }
 
-        //condição de vitória da cerca
-        if(isGatoPreso(novaPosicaoGato, updatedGrid)){
-            return estadoAtualGame.copy(
+        return if (isGatoPreso(estadoAtualGame.posicaoGato, updatedGrid)) {
+            estadoAtualGame.copy(
                 grid = updatedGrid,
-                posicaoGato = novaPosicaoGato,
                 status = GameStatus.CERCA_VENCEU,
                 seCercaVenceu = estadoAtualGame.seCercaVenceu + 1
             )
+        } else {
+            estadoAtualGame.copy(grid = updatedGrid)
         }
-
-        //jogo continua
-        return estadoAtualGame.copy(
-            grid = updatedGrid,
-            posicaoGato = novaPosicaoGato,
-            status = GameStatus.JOGANDO
-        )
     }
 
+
+
     //lógica pra jogada da cerca com BFS para achar a menor rota do gato e tentar impedir
-    private fun calcularJogadaCPU(posicaoGato: Int, grid: List<QuadradoState>): Int {
+    private fun calcularJogadaCerca(posicaoGato: Int, grid: List<QuadradoState>): Int {
         val fila = ArrayDeque<Int>()
         val parent = mutableMapOf<Int, Int>()
         val visitados = BooleanArray(121)
@@ -142,7 +155,7 @@ class GameConfig {
         return vizinhos.none { grid[it] == QuadradoState.VAZIO }
     }
 
-    // A base matemática crucial: calcular os 6 vizinhos no array 1D
+    //calcula os 6 vizinhos no array
     fun getVizinhos(index: Int): List<Int> {
         val vizinhos = mutableListOf<Int>()
         val lin = index / 11
