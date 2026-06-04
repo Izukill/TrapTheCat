@@ -13,28 +13,24 @@ import kotlinx.coroutines.flow.update
 
 class GameViewModel : ViewModel() {
 
-    private val engine = GameConfig()
+    private val config = GameConfig()
 
     //estado interno que pode ser modificado
-    private val _uiState = MutableStateFlow(GameState())
+    private val _uiState = MutableStateFlow(config.criarStatusInicial(0, 0))
 
     //estado para a tela
     val uiState: StateFlow<GameState> = _uiState.asStateFlow()
 
-    init {
-        comecaJogo()
+    fun onQuadradoClicked(index: Int) {
+        _uiState.update { estadoAtual -> config.jogada(estadoAtual, index) }
     }
 
     fun comecaJogo() {
-        val estadoAtual = _uiState.value
-        _uiState.value = engine.criarStatusInicial(estadoAtual.seGatoVenceu, estadoAtual.seCercaVenceu)
+        //placares anteriores mantidos
+        val placarGato = _uiState.value.seGatoVenceu
+        val placarCerca = _uiState.value.seCercaVenceu
+
+        _uiState.value = config.criarStatusInicial(gatoVenceu = placarGato, cercaVenceu = placarCerca)
     }
 
-    fun onCellClicked(index: Int) {
-        if (_uiState.value.status != GameStatus.JOGANDO) return
-
-        _uiState.update { currentState ->
-            engine.jogada(currentState, index)
-        }
-    }
 }
