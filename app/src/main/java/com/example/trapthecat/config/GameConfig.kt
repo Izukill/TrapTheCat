@@ -8,13 +8,22 @@ class GameConfig {
 
     fun criarStatusInicial(gatoVenceu: Int, cercaVenceu: Int): GameState {
         val newGrid = MutableList(121) { QuadradoState.VAZIO }
-        newGrid[60] = QuadradoState.GATO //inicia com o gato no meio
+        val posicaoInicialGato = 60
+        newGrid[posicaoInicialGato] = QuadradoState.GATO //inicia com o gato no meio
 
-        //falta implementar a lógica de sorteio para os quadrados preenchidos
+        val posicoesDisponiveis = (0 until 121)
+            .filter { it != posicaoInicialGato }
+            .shuffled()
+
+        val quantidadeCercas = (9..15).random()
+
+        posicoesDisponiveis
+            .take(quantidadeCercas)
+            .forEach { indice -> newGrid[indice] = QuadradoState.CERCA }
 
         return GameState(
             grid = newGrid,
-            posicaoGato = 60,
+            posicaoGato = posicaoInicialGato,
             status = GameStatus.JOGANDO,
             seGatoVenceu = gatoVenceu,
             seCercaVenceu = cercaVenceu
@@ -139,7 +148,7 @@ class GameConfig {
         val lin = index / 11
         val col = index % 11
 
-        // Em um grid hexagonal, o deslocamento das colunas vizinhas acima e abaixo depende se for par ou impar
+        //em um grid hexagonal, o deslocamento das colunas vizinhas acima e abaixo depende se for par ou impar
         val isLinhaPar = lin % 2 == 0
 
         //lista para calcular os offsets (linha,coluna)
