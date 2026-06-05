@@ -57,6 +57,21 @@ fun TelaDoJogo(viewModel: GameViewModel) {
         verticalArrangement = Arrangement.Center
     ) {
 
+        //switch pra trocar entre singleplayer e multiplayer
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+        ) {
+            Text(text = "Singleplayer", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Switch(
+                checked = gameState.isMultiplayer,
+                onCheckedChange = { isChecked -> viewModel.toggleModoMultiplayer(isChecked) },
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+            Text(text = "Multiplayer", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        }
+
         //placar
         Text(
             text = "Gato: ${gameState.seGatoVenceu} | Cerca: ${gameState.seCercaVenceu}",
@@ -90,10 +105,22 @@ fun TelaDoJogo(viewModel: GameViewModel) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        val textoInstrucao = if (gameState.isMultiplayer) {
+            if (gameState.isTurnoGato) {
+                "Turno do Gato (Jogador 1): Fuja para as bordas!"
+            } else {
+                "Turno da Cerca (Jogador 2): Clique numa casa vazia para fechar o gato!"
+            }
+        } else {
+            "Você é o gato, corra para as bordas e não deixe a cerca te fechar."
+        }
+
         Text(
-            text = "Você é o gato, corra para as bordas e não deixe a cerca te fechar.",
+            text = textoInstrucao,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp),
+            fontWeight = if (gameState.isMultiplayer) FontWeight.Bold else FontWeight.Normal,
+            color = if (gameState.isMultiplayer && !gameState.isTurnoGato) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
         )
 
         //checagem de vitória para mostrar o AlertDialog com a mensagem

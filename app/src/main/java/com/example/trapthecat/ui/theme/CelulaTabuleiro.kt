@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.trapthecat.model.QuadradoState
+import com.example.trapthecat.model.CelulaState
 
 //classe para carregar os hexagonos
 class CelulaHexagona : Shape {
@@ -52,14 +52,14 @@ class CelulaHexagona : Shape {
 
 @Composable
 fun CelulaTabuleiro(
-    estado: QuadradoState,
+    estado: CelulaState,
     tamanho: Dp,
     onClick: () -> Unit
 ) {
     val corFundo = when (estado) {
-        QuadradoState.VAZIO -> Color(0xFFB0BEC5)
-        QuadradoState.CERCA -> Color(0xFF37474F)
-        QuadradoState.GATO -> Color(0xFFFF9800)
+        CelulaState.VAZIO -> Color(0xFFB0BEC5)
+        CelulaState.CERCA -> Color(0xFF37474F)
+        CelulaState.GATO -> Color(0xFFFF9800)
     }
 
     Box(
@@ -72,9 +72,9 @@ fun CelulaTabuleiro(
         contentAlignment = Alignment.Center
     ) {
         when (estado) {
-            QuadradoState.GATO -> Text(text = "🐱", fontSize = (tamanho.value * 0.45).sp)
-            QuadradoState.CERCA -> Text(text = "🚧", fontSize = (tamanho.value * 0.35).sp)
-            QuadradoState.VAZIO -> {}
+            CelulaState.GATO -> Text(text = "🐱", fontSize = (tamanho.value * 0.45).sp)
+            CelulaState.CERCA -> Text(text = "🚧", fontSize = (tamanho.value * 0.35).sp)
+            CelulaState.VAZIO -> {}
         }
     }
 }

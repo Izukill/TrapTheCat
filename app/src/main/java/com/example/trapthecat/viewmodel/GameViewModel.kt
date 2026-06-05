@@ -29,12 +29,18 @@ class GameViewModel : ViewModel() {
         //placares anteriores mantidos
         val placarGato = _uiState.value.seGatoVenceu
         val placarCerca = _uiState.value.seCercaVenceu
+        val modoAtual = _uiState.value.isMultiplayer
 
-        _uiState.value = config.criarStatusInicial(gatoVenceu = placarGato, cercaVenceu = placarCerca)
+        _uiState.value = config.criarStatusInicial(gatoVenceu = placarGato, cercaVenceu = placarCerca, isMultiplayer = modoAtual)
     }
 
     fun reiniciarPlacar(){
-        _uiState.value = config.criarStatusInicial(gatoVenceu = 0, cercaVenceu = 0)
+        val modoAtual = _uiState.value.isMultiplayer
+        _uiState.value = config.criarStatusInicial(gatoVenceu = 0, cercaVenceu = 0, isMultiplayer = modoAtual)
+    }
+
+    fun toggleModoMultiplayer(isMultiplayer: Boolean) {
+        _uiState.value = config.criarStatusInicial(gatoVenceu = 0, cercaVenceu = 0, isMultiplayer = isMultiplayer)
     }
 
 }
