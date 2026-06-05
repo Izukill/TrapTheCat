@@ -33,4 +33,8 @@ class GameViewModel : ViewModel() {
         _uiState.value = config.criarStatusInicial(gatoVenceu = placarGato, cercaVenceu = placarCerca)
     }
 
+    fun reiniciarPlacar(){
+        _uiState.value = config.criarStatusInicial(gatoVenceu = 0, cercaVenceu = 0)
+    }
+
 }

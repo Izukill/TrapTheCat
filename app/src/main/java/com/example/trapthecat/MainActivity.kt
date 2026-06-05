@@ -13,6 +13,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import com.example.trapthecat.ui.theme.TrapTheCatTheme
 import com.example.trapthecat.viewmodel.GameViewModel
 import com.example.trapthecat.model.GameStatus
@@ -46,7 +48,7 @@ fun TelaDoJogo(viewModel: GameViewModel) {
     val screenWidth = configuration.screenWidthDp.dp
     val espacoLivreHorizontal = screenWidth - 32.dp - 20.dp
 
-    val tamanhoCelula = espacoLivreHorizontal / 11.5f //divide por 11 (11x11)
+    val tamanhoCelula = espacoLivreHorizontal / 11.5f //divide por 11.5 (11x11)
     val deslocamentoImpar = tamanhoCelula / 2f
 
     Column(
@@ -88,24 +90,84 @@ fun TelaDoJogo(viewModel: GameViewModel) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        when (gameState.status) {
-            GameStatus.JOGANDO -> {
-                Text(text = "Você é o gato, tente escapar para as bordar", fontSize = 16.sp)
+        Text(
+            text = "Você é o gato, corra para as bordas e não deixe a cerca te fechar.",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
+        //checagem de vitória para mostrar o AlertDialog com a mensagem
+        if (gameState.status != GameStatus.JOGANDO) {
+
+            val titulo = if (gameState.status == GameStatus.GATO_VENCEU) "Você venceu! :3" else "Você perdeu :("
+            val mensagem = if (gameState.status == GameStatus.GATO_VENCEU) {
+                "Parabéns! Você conseguiu escapar para as bordas do tabuleiro."
+            } else {
+                "Fim de jogo! A Cerca encurralou você te deixando sem rota de fuga."
             }
-            GameStatus.GATO_VENCEU -> {
-                Text(text = "Você escapou, Muito bem!", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { viewModel.comecaJogo() }) {
-                    Text("Próxima Partida")
+            val emoji = if (gameState.status == GameStatus.GATO_VENCEU) "🐱" else "🚧"
+
+            AlertDialog(
+                onDismissRequest = { },
+                title = {
+                    Text(
+                        text = titulo,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 22.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                text = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = mensagem,
+                            fontSize = 16.sp,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = emoji,
+                            fontSize = 64.sp
+                        )
+                    }
+                },
+                //coloquei os 2 botões num row para ficar um ao lado do outro, o comportamento nativo é de empilhamento
+                confirmButton = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 4.dp), //espaço para os botões não colarem nas bordas
+                        horizontalArrangement = Arrangement.spacedBy(12.dp) //espaço entre os botões
+                    ) {
+                        OutlinedButton(
+                            onClick = { viewModel.reiniciarPlacar() },
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(vertical = 12.dp)
+                        ) {
+                            Text(
+                                text = "Zerar\nPlacar",
+                                textAlign = TextAlign.Center,
+                                fontSize = 14.sp
+                            )
+                        }
+                        Button(
+                            onClick = { viewModel.comecaJogo() },
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(vertical = 12.dp)
+                        ) {
+                            Text(
+                                text = "Jogar\nNovamente",
+                                textAlign = TextAlign.Center,
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
                 }
-            }
-            GameStatus.CERCA_VENCEU -> {
-                Text(text = "O Gato foi encurralado!", fontSize = 18.sp, color = MaterialTheme.colorScheme.error)
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(onClick = { viewModel.comecaJogo() }) {
-                    Text("Tentar Novamente")
-                }
-            }
+            )
         }
     }
 }
