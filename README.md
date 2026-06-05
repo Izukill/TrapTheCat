@@ -12,7 +12,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **Trap The Cat** é um jogo de tabuleiro de lógica e estratégia desenvolvido nativamente para Android como projeto da matéria de desenvolvimento de aplicativos móveis. O jogo ocorre em um grid hexagonal de 11x11, onde dois papéis se enfrentam: o **Gato**, cujo objetivo é fugir alcançando qualquer borda do tabuleiro, e a **Cerca**, que deve bloquear todos os caminhos e encurralar o Gato.
+Desenvolvido para a matéria de desenvolvimento de aplicativos móveis, o **Trap The Cat** é um jogo de tabuleiro de lógica e estratégia desenvolvido nativamente para Android como projeto da matéria de desenvolvimento de aplicativos móveis. O jogo ocorre em um grid hexagonal de 11x11, onde dois papéis se enfrentam: o **Gato**, cujo objetivo é fugir alcançando qualquer borda do tabuleiro, e a **Cerca**, que deve bloquear todos os caminhos e encurralar o Gato.
 
 O aplicativo conta com dois modos de jogo:
 
