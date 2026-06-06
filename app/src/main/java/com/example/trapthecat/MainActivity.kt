@@ -107,9 +107,9 @@ fun TelaDoJogo(viewModel: GameViewModel) {
 
         val textoInstrucao = if (gameState.isMultiplayer) {
             if (gameState.isTurnoGato) {
-                "Turno do Gato (Jogador 1): Fuja para as bordas!"
+                "Turno do Gato 🐱: Fuja para as bordas!"
             } else {
-                "Turno da Cerca (Jogador 2): Clique numa casa vazia para fechar o gato!"
+                "Turno da Cerca 🚧: Clique numa casa vazia para fechar o gato!"
             }
         } else {
             "Você é o gato, corra para as bordas e não deixe a cerca te fechar."
@@ -171,23 +171,23 @@ fun TelaDoJogo(viewModel: GameViewModel) {
                         horizontalArrangement = Arrangement.spacedBy(12.dp) //espaço entre os botões
                     ) {
                         OutlinedButton(
-                            onClick = { viewModel.reiniciarPlacar() },
-                            modifier = Modifier.weight(1f),
-                            contentPadding = PaddingValues(vertical = 12.dp)
-                        ) {
-                            Text(
-                                text = "Zerar\nPlacar",
-                                textAlign = TextAlign.Center,
-                                fontSize = 14.sp
-                            )
-                        }
-                        Button(
                             onClick = { viewModel.comecaJogo() },
                             modifier = Modifier.weight(1f),
                             contentPadding = PaddingValues(vertical = 12.dp)
                         ) {
                             Text(
                                 text = "Jogar\nNovamente",
+                                textAlign = TextAlign.Center,
+                                fontSize = 14.sp
+                            )
+                        }
+                        Button(
+                            onClick = { viewModel.reiniciarPlacar() },
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(vertical = 12.dp)
+                        ) {
+                            Text(
+                                text = "Zerar\nPlacar",
                                 textAlign = TextAlign.Center,
                                 fontSize = 14.sp
                             )
